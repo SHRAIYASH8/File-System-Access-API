@@ -1,0 +1,169 @@
+<html>
+<title>File System Access API</title>
+
+<head>
+	<link href='https://fonts.googleapis.com/css?family=Cookie' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<style>
+		body {
+			background: linear-gradient(137deg, rgb(255, 122, 89) 10%, #33475b 80%);
+		}
+
+		.header-fixed {
+			background: linear-gradient(40deg, #33475b 10%, rgb(255, 122, 89) 80%);
+			box-shadow: 0 1px 1px #ccc;
+			padding: 20px 40px;
+			height: 100px;
+			color: #ffffff;
+			box-sizing: border-box;
+			top: -100px;
+			border-radius: 15px;
+			-webkit-transition: top 0.3s;
+			transition: top 0.3s;
+		}
+
+		.header-fixed .header-limiter {
+			max-width: 1200px;
+			text-align: center;
+			margin: 0 auto;
+		}
+
+		.header-fixed .header-limiter h1 {
+			float: left;
+			font: normal 28px Cookie, Arial, Helvetica, sans-serif;
+			line-height: 40px;
+			margin: 0;
+		}
+
+		.header-fixed .header-limiter h1 span {
+			color: #f4f7fc;
+		}
+
+		#myBtn1,
+		#myBtn2,
+		#myBtn3 {
+			display: inline-block;
+			padding: 0.35em 1.2em;
+			border: 0.1em solid #FFFFFF;
+			margin: 0 0.3em 0.3em 0;
+			border-radius: 0.12em;
+			box-sizing: border-box;
+			text-decoration: none;
+			font-family: 'Roboto', sans-serif;
+			font-weight: 300;
+			color: #FFFFFF;
+			text-align: center;
+			transition: all 0.2s;
+			background-color: transparent;
+		}
+
+		#myBtn1:hover,
+		#myBtn2:hover,
+		#myBtn3:hover {
+			color: #000000;
+			background-color: #FFFFFF;
+		}
+
+		p {
+			float: right;
+		}
+
+		section{
+			position: fixed;
+			bottom: 10;
+			right: 10;
+			max-width: 450px;
+			border: 1px double lightgray;
+			padding:20px;
+			font: normal 24px sans-serif, Helvetica, Arial;
+		}
+	</style>
+</head>
+
+<body>
+	<header class="header-fixed">
+		<div class="header-limiter">
+			<h1><a href="https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API"
+					style="text-decoration: none !important;" target="_blank">File System Access API</a></h1>
+			<button id="myBtn1" class="myBtn">click to save (READ/WRITE)</button>
+			<button id="myBtn2" class="myBtn">click to open file !!</button>
+			<button id="myBtn3" class="myBtn">click me to open directory</button>
+			<p id="placeHolder">Thanks. Keep Learning !!</p>
+		</div>
+	</header>
+	<div class="w3-container">
+		<section>
+			This API allows interaction with files on a user's local device, or on a user-accessible network file
+			system. Core functionality of this API includes reading files, writing or saving files, and access to
+			directory structure.
+			<br><br>
+			<span> Made with <span style="color: #e25555;">&hearts;</span> by <a href="https://github.com/SHRAIYASH8" target="_blank">Shraiyash</a>
+				in <a href="https://www.google.com/maps/place/India/@20.0105033,64.4313408,4z/data=!3m1!4b1!4m5!3m4!1s0x30635ff06b92b791:0xd78c4fa1854213a6!8m2!3d20.593684!4d78.96288" target="_blank">India</a> </span>
+		</section>
+	</div>
+	<script>
+		async function getDirectory() {
+			const directoryHandler = await window.showDirectoryPicker();
+			console.table(directoryHandler);
+			document.getElementById('placeHolder').innerText = directoryHandler.name + " directory opened successfully!!";
+		}
+		async function getTheFileViaOpenFilePicker(pickerOpts) {
+			[fileHandle] = await window.showOpenFilePicker(pickerOpts);
+			const fileData = await fileHandle.getFile();
+			const contents = await fileData.text();
+			console.table(fileData);
+			document.getElementById('placeHolder').innerText = fileData.name + " opened successfully!!\n" + contents;
+		}
+		async function readTheFile(fileHandle) {
+			const fileData = await fileHandle.getFile();
+			const contents = await fileData.text();
+			document.getElementById('placeHolder').innerText = contents;
+		}
+		async function writeFile(fileHandle, contents) {
+			const writable = await fileHandle.createWritable();
+			await writable.write(contents);
+			await writable.close();
+		}
+		document.querySelectorAll(".myBtn").forEach(item => {
+			item.addEventListener("click", async (event) => {
+				try {
+					document.getElementById('placeHolder').innerText = "Thanks. Keep Learning !!";
+					const btnID = event.currentTarget.id;
+					switch (btnID) {
+						case "myBtn1":
+							const saveFile = await window.showSaveFilePicker({
+								types: [{
+									description: 'Text file',
+									accept: { 'text/plain': ['.txt'], 'text/html': ['.html'] },
+								}],
+								suggestedName: 'New_Text_Doc.txt',
+								excludeAcceptAllOption: true,
+							});
+							await writeFile(saveFile, 'This is a new text file');
+							await readTheFile(saveFile);
+							break;
+						case "myBtn2":
+							await getTheFileViaOpenFilePicker({
+								types: [{
+									description: 'Text file',
+									accept: { 'text/plain': ['.txt'], 'text/html': ['.css'] },
+								}],
+								excludeAcceptAllOption: true,
+								multiple: false
+							});
+							break;
+						case "myBtn3":
+							await getDirectory();
+							break;
+						default:
+							console.log('No option selected');
+					}
+				} catch (e) {
+					console.log(e);
+				}
+			});
+		});
+	</script>
+</body>
+
+</html>
